@@ -491,8 +491,28 @@ INNER JOIN bsg_people P ON P.id = CP.pid GROUP BY C.title;
 Week 5:
 ------------------------------------------------------------------
 
+Subquery -> use some result as a parameter in another query
+
+distinct -> only shows us 1 of each type/field that we selected
+
+Max MSRP for planes is 157.69, but what if we add more planes to the products later on?  Well, we should NOT do this:
+	select productName from products where MSPR > 157.69
+	
+	Instead, use this:
+	select productName from products where MSPR > (select MAX(MSRP) from products where productline = "Planes";);	
+
+	This is a subquery used to get some max in the planes msrp, which we then use as a parameter in the product search
+		-> have to use max since in this case it would return more than 1 row otherwise
+		
+
+GROUP BY -> allows us to group a certain field together
+	-> nice when doing sum, count, etc..
+	
+HAVING -> like a WHERE, but it works on our aggregate functions (things that are grouped)
 
 
+	
+	
 
 
 
