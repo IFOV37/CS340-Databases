@@ -1,0 +1,535 @@
+CS 340 Notes
+Fall 2017 term
+
+
+Lecture 1 - Intro to Databases Overview
+
+Database: structured collection of related, meaningful data
+
+Example: Grocery store
+
+	Data:
+		possible inventory
+		current stock
+		employees
+		departments
+
+	Structure:
+		current stock must from from possible inventory
+		employees maintain department
+
+	Miniworld:
+		the stuff in a grocery store
+
+
+Example 2: Bank
+	
+	Data:
+		Customers
+		Accounts
+		Employees
+		Rates
+
+	Structure
+		Customers have accounts
+		Accounts have interest rates
+		Employees contact customers
+
+	Miniworld
+		The bank and related outside information
+
+
+Kinds of Databases:
+	Static geographic data in a hiking GPS
+
+	Dynamic data in an Excel spreadsheet that I use for grades
+
+	Dynamic data in a website like Amazon
+		**We will focus on this example**
+
+
+DataBase Management System (DBMS) tool for accessing DB
+	Provides:
+
+			Redundancy control
+			Access Control
+			Persistent storage
+			Querying system
+			Backup
+			Concurrent access
+			Enforcing contraints
+
+
+	Downsides:
+
+			Overhead
+			Complexity
+
+	When not to use:
+
+			Embedded systems with little memory
+			static data
+			single user
+
+
+What to think about?:
+
+	Focus on the app dev:
+
+		Design data so it makes sense to them
+		Consider the types of queries they will want to run
+
+
+	Then focus on the end user:
+
+		Make sure all data they want actually exists
+		Make sure the database is the best tool to meet their needs
+
+
+
+Week 2 lectures
+---------------------------------------------------------------------------------------------------
+The Entity Relation Model
+
+3 main parts:
+	Entities
+	Relationships
+	Attributes
+
+
+Attributes:
+
+	-> smallest division of data (shouldn't really be able to split)
+		Ex: first name, SSN, product quantity
+		Bad: Address, car, toppings on a pizza
+
+
+
+BAD:
+
+Name: Jane Smith
+
+GOOD:
+
+First name: Jane
+Last name: Smith
+
+
+
+Entites:  Actual things in our data [we are trying to describe]
+
+Examples:
+	People
+	Space ships
+	Locations
+	Inventory
+
+	-> composed of attributes
+	-> stored together in tables
+
+
+Relationships: relations between entites
+
+	-> can be built into entity tables or can be its own table
+
+	Examples:
+		Employees can work in many departments
+		Managers can manage one department
+		Students can be in many classes
+		A class must be in at least one department
+		A transaction must be associate to one customer
+
+
+
+A good way to use/do a many-to-many relationship is to:
+Make a table with ids in it:
+		Say we have more than one certifications and more than one person.
+			-> Each person could be certified in/have more than one certification.
+
+	You could have a cert_people table that has attributes of cid (cert id) and pid (person id)
+		-> This relates 1 id to another id
+
+
+Schemas: a table set of constraints on data (table definition)
+	-> exist for Entities and Relationships
+
+	-> composd of attributes and constraints
+
+
+A Relation: a table and all its entries (can be a table of entities and relationships)
+	-> rows are not ordered
+	-> rows are unique
+
+A Relation Schema: The set of constraints on the relation
+
+
+Tuple: a row in the table
+
+Degree: number of attributes in a relation
+	-> number of columns in the table
+
+Cardinality: number of possible unique rows in a relation
+
+
+Integrity Constraints: Rules specifying what can go in a tuple
+
+Types:
+
+	Domain: Restricts the domain of an atribute (int, varchar, float)
+
+	Key: Requires that the entries in a column or combination of columns be unique (a lot more on this later)
+
+	Not Null: Requires that a value always be specified for an attribute
+
+	Entity: Primary keys can not be null
+
+	Referential: Requires that an attribute be present in another table (more on this later)
+
+	Semantic: Rules about the system outside of the database (e.g. Only juniors and senors can take 300 level calsses)
+
+
+Schema Notation:
+
+	Book does this:    _ID_ (underlined) 	Name  		Year   		GPA  		Birtday
+
+	More SQL like notation:
+								Students(
+								_ID_,
+								Name,
+								Year,
+								GPA,
+								Birthday)
+
+
+
+	Underlined Attributes: these are the attributes making up the primary key
+
+
+SQL: 
+
+	-> is a DDL (data definition language) and querying language
+
+	-> can create definitions, ad/remove data, and query the DB
+
+Basic Commands:
+
+	CREATE TABLE: creates new table
+
+	INSERT INTO: inserts rows into a table
+
+	DROP TABLE: deletes an entire table
+
+	SELECT: returns rows from a table
+
+	DELETE: deletes rows from a table
+
+	UPDATE: changes contents of rows in a table
+
+
+	
+	CREATE command:
+
+		CREATE TABLE `bsg_planets` (
+		`id` int(11) NOT NULL AUTO_INCREMENT,
+		`name` varchar(255) NOT NULL,
+		`population` bigint,
+		`language` varchar(255),
+		`capitol` varchar(255),
+		PRIMARY KEY (`id`),
+		UNIQUE KEY (`name`)
+		) ENGINE=InnoDB;
+
+
+		-> creates a table called bsg_planets
+		-> attributes inside ()
+
+
+		'id' int NOT NULL AUTO_INCREMENT
+
+			-> creates an integer attribute called 'id' that can not be null and will automatically increment on every new row
+
+		'name' varchar(255) NOT NULL
+				-> variable length character array of max length 255
+
+		'population' bigint (larger than regular int)
+			-> creates a big integer attribute
+
+		PRIMARY KEY ('id')
+			-> sets 'id' to be the primary key
+				-> I.E. IT MUST BE UNIQUE
+
+			-> could also be id,name where the combination has to be unique
+
+		UNIQUE KEY ('name')
+			-> sets name to be a unique field
+				-> so we don't have planets with the same name (i.e. creating it twice)
+
+		ENGINE=InnoDB
+			-> sets DB engine to InnoDB
+			-> always do this for this class
+			-> allows us to specify foreign keys
+
+
+
+	INSERT INTO bsg_planets (name,population,
+	language, capitol) values
+	(“Gemenon”,2800000000, “Old Gemenese",
+	“Oranu");
+
+			INSERT INTO bsg_planets
+				-> inserts rows into bsg_planets with these values	
+				-> the first set is the columns where we are inserting the data
+				-> each row is a tuple, so we could insert multiple rows, separated by a comma
+
+
+
+	DROP TABLE bsg_planets;
+
+		-> Deletes the table and all rows
+
+
+
+	SELECT name, population FROM bsg_planets
+	WHERE population > 2700000000;
+
+		Select name, pop
+			-> specifies column to select
+			-> use * to select all columns, don't do this if other applications will use values from returned rows.. could break something if the data is shifted
+
+
+		FROM bsg_planets
+			-> table to select from
+
+		WHERE pop > 27....
+			-> condition to select rows
+			-> option
+			-> normal equality ops work
+				-> = for equality, <> for not equals
+			->strings need to be in quotes
+
+	DELETE FROM bsg_planets WHERE name =
+	“blah”;
+
+		Chooses table to delete rows where the condition is met
+			-> if unsure, run as a SELECT to see what data is shown
+
+
+	UPDATE bsg_planets SET name = ‘Caprica’
+	WHERE id=3;
+
+		Picks the table to update, "sets" the name attribute/field, where the id = 3 (which row to update)
+
+
+
+• INT - -2147483648 to 2147483647
+• BIGINT – Bigger than int
+• FLOAT – Floating point
+• DECIMAL (M,D) – Contains M digits with D right of the decimal point
+• VARCHAR(M) – Variable length string of max length M
+• CHAR(M) – Fixed length string of length M
+
+
+
+
+
+Week 3:
+------------------------------------------------------------------
+
+ER Diagrams: diagram abstract databases
+	-> visual way of designing
+	-> allow easy recognition
+
+	Entity = Rectangle
+
+	Relationship = Diamond
+
+	Attribute = Oval
+		-> Key Attribute is UNDERLINED
+
+	Connector = line
+
+
+		DOUBLE LINE means it MUST have something
+		i.e. 
+
+			Employee ---- 1 --- Manages ----- 1 ---- Department
+										------  ----
+				If a department exists, it MUST be managed by an employee
+					-> called Total Participation
+
+
+
+Keys: a set of attributes which let us uniquely define a row in a table
+	(This is actually a super key)
+
+
+		A key is a super key with the ocndition that it is minimal
+			-> remove any attribute and it is no longer a super key
+
+	A key is also known as a candidate key
+
+
+Primary Key:
+
+	Table will have 1 of these
+
+	It is the chosen candidate key
+		-> can be totally arbitrary, but must be chosen
+
+
+Foreign eys reference primary keys
+
+When in doubt, make the auto incrementing integer the primary key!
+
+
+
+Foreign Keys:  used in relationships
+	-> 1 to M or M to M relationships
+
+	Typically don't need in 1 to 1
+
+
+	foreign key constraint says that an attribute can only contain values that are
+		the primary key for a specified table
+
+
+If we look back at our tables, the foregin keys would be:
+
+	Homeworld column in people table has a f key to the planets table
+
+	bsg_cert_people has 2 f keys:
+
+		cid (certification id) that references a specific certification
+			-> cid in bsg_cert_people MUST be in bsg_cert
+
+		pid (people/person id) that references a specific person
+
+
+	Foregin key Behavior:
+
+		Illegal adds:
+
+			-> try to add a row or update a row and include a non-existent foreign value
+			-> flat out rejected
+
+
+	2 Conditions can break relationships:
+		Update
+		Delete
+
+
+	3 Possible Outcomes:
+
+		1) NO ACTION
+			-> rejects the attempt to change (update/delete) the reference row
+
+			i.e. updating to 4 would roll this back to a 1 based on the references
+
+		2) CASCADE:
+			-> propagate the changes to the referencer
+
+			i.e. if I updated the "Viper" id in bsg_cert, it would change the appropriate bsg_cert_people cids to 4
+
+		3) SET NULL:
+			-> Sets the referencer to a NULL value
+
+			i.e. if I updated "viper" to 4, this would set the cids to NULL in bsg_cert_people
+
+
+
+
+	CREATE TABLE `bsg_cert_people` (
+	 `cid` int(11) NOT NUL,
+	 `pid` int(11) NOT NULL,
+	 PRIMARY KEY (`cid`,`pid`),
+	 FOREIGN KEY (`cid`) REFERENCES `bsg_cert` (`id`),
+	 FOREIGN KEY (`pid`) REFERENCES `bsg_people` (`id`)
+	) ENGINE=InnoDB;
+
+
+	FOREIGN KEY (`cid`) REFERENCES `bsg_cert` (`id`):
+		-> means that the value in the 'cid' column in bsg_cert_people MUST BE IN the 'id' column of bsg_cert
+
+
+
+
+
+
+Week 4:
+------------------------------------------------------------------
+
+
+JOINS
+
+
+SELECT P.fname, P.lname, C.title FROM bsg_cert C
+INNER JOIN bsg_cert_people CP ON CP.cid = C.id
+INNER JOIN bsg_people P ON P.id = CP.pid;
+
+joining 3 tables (bsg_people, bsg_cert, and bsg_cert_people) where the
+cids and pids are the same
+
+
+
+Aggregate functions work on many rows
+	-> Required GROUP BY to group rows into sets to apply operations
+
+
+SELECT student_name, AVG(test_score) FROM student GROUP BY student_name;
+
+	-> returns a table with a single row for every student name that contains the name and the average
+		of all test_scores for that name
+
+
+SELECT C.title, COUNT(P.id) AS `CertCount` FROM bsg_cert C
+INNER JOIN bsg_cert_people CP ON CP.cid = C.id
+INNER JOIN bsg_people P ON P.id = CP.pid GROUP BY C.title;
+
+
+
+
+Week 5:
+------------------------------------------------------------------
+
+
+
+
+...
+
+
+
+Week 9: Normalization
+------------------------------------------------------------------
+
+Functional Dependencies -> relations some attributes to determine other attributes
+	Exs:
+			SSN to get name of employee
+			StudentID and CRN to determine grade
+
+			If an attribute X determines some attribute Y, we say Y is functionally dependent on X
+				X -> Y
+
+
+1 Normal Form (1NF):
+	-> Needs to have atomic values
+
+	-> can fix by dividing values into rows, cols, or other tables
+
+	-> sep tables typically better
+
+2nd NF:
+
+	-> if every nonprime attribute (not part of the primary key) must not be partially dependent on any key
+
+	Problem:
+				People  	Certs   CertType
+				Lee Adama	Viper 	Piloting
+
+	To fix:
+
+		People  	Certs 					Certs 		CertType
+		Lee Adama	Viper 					Viper 		Piloting
+
+
+
+
